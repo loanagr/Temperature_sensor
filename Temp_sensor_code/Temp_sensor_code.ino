@@ -18,6 +18,9 @@ sensor and pure OneWire based communication.
 
 // User-defined constants
 const String logfile = "tsensor.log";
+float temp_sum = 0;
+int count = 1;
+String header = "# timestamp, millis, sensor_id, temperature in °C with 2 digits (spot, avg)";
 
 
 RTC_DS1307 rtc;    //communication with the clock: always use rtc in the following
@@ -37,12 +40,14 @@ void setup(){
     //WHen time needs to be sot on a new device, or ater a power loss, the following
     //line sets the RTC to the date & time this sketch was completed (!)
 
-    //rtc.adjust(DateTime(F(__DATE__),F(__TIME__)));
+    rtc.adjust(DateTime(F(__DATE__),F(__TIME__)));
 
   if (!SD.begin(10)) {
     Serial.println("SD module initialization failed or Card is not present");  //if the SD card at bin 10 is not present
     return; //breaks the routine
   }
+
+  printOutputln(header);
   }
 
 void loop(){
@@ -57,7 +62,6 @@ void loop(){
     rom_code[i] = ow.read();
   }
 
-  delay(1000);
   //Check, if the sensor actually is a DS18B20 sensor -> the first bit in the rom_code has to be 0x28!
   if (rom_code[0] != IS_DS18B20_SENSOR) {
     Serial.println("Sensor is not a DS18B20 sensor!");
@@ -92,18 +96,41 @@ void loop(){
   //until now, the numbers after the comma are not included! 12bit resolution with 4 decimals behind the comma: devide by 2^4 (4 commas)
   //now convert the number into float temperature value
 
-  float tempCelsius = tempRead / 16.0;  //divide by 2^4 = 16 for 4 digits after the comma 
+  float tempCelsius = tempRead / 16.0;  //divide by 2^4 = 16 for 4 digits after the comma
+  temp_sum += tempCelsius; 
 
+  if (count%10==0){
+    float temp_avg = temp_sum/10;
+    //Print timestamp, sensor ID, temperature (spot)
+    printOutput(String(getISOtime()));
+    printOutput(String(", "));
+    printOutput(String(millis()));
+    printOutput(String(", "));
+    printOutput(String(registration_number));
+    printOutput(String(", ")); 
+    printOutput(String(tempCelsius));
+    printOutput(String(", "));
+    printOutputln(String(temp_avg));
+    temp_sum = 0;
 
-  //Print timestamp, sensor ID, temperature (spot)
-  printOutput(String(getISOtime()));
-  printOutput(String(", "));
-  printOutput(String(millis()));
-  printOutput(String(", "));
-  printOutput(String(registration_number));
-  printOutput(String(", ")); 
-  printOutputln(String(tempCelsius));
+  }
+
+  //set time interval to 1 second
+
+  //float next_1000 = (int(millis()/1000.0 +1.0)*1000.0);
+
+  //Serial.println(millis());
+
+  //Serial.println("Next 1000: " + String (next_1000));
+  //Serial.println("Difference: " + String (next_1000-millis()));
+
+  //if (next_1000-millis() < 0) {
+  //  Serial.println("Error!");
+  //}
   
+  delay(((int(millis()/1000.0 +1.0)*1000.0))-millis()-1);
+  
+  count+=1;
 
   
   
