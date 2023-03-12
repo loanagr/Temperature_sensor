@@ -11,7 +11,7 @@ Calibration and time constant measurement time series were taken in the ice labo
 ***
 This repository has be be cloned on your local machine with the following command:
 ```bash
-git clone https://
+git clone https://github.com/loanagr/Temperature_sensor.git
 ```
 Connect Arduino and temperature sensor DS18B20 as decribed in the report and load the code onto the Arduino.
 
