@@ -1,6 +1,9 @@
 /*
- * This file holds all the required HEX commands for working with the DS18B20 sensor
+ * Author:   Loana Grom
+ * Email:    loana.grom@studium.uni-hamburg.de
+ * Date:     2023-03-12
  * 
+ * This file holds all the required HEX commands for working with the DS18B20 sensor
  */
 
 #define CONVERT_T 0x44
